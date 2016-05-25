@@ -1,0 +1,22 @@
+<launch>
+
+<include file="$(find pioneer_bringup)/launch/minimal.launch" />
+
+<arg name="camera" default="0" />
+<group if="$(arg camera)">
+	<include file="$(find usb_cam)/launch/usb_cam-test.launch" />
+</group>
+
+<group>
+	<node pkg="lms1xx" type="LMS1xx_node" name="LMS1xx_node" output="screen" >
+		<param name="host" value="192.168.0.1" />
+	</node>
+
+	<node pkg="pioneer_bringup" type="odom_baselink_tf.py" name="odom_baselink_tf" output="screen" />
+
+	<node pkg="tf" type="static_transform_publisher" name="basefootprint_baselink_tf" args="0.0 0.0 0.0 0.0 0.0 0.0 base_footprint base_link 100" />
+
+	<node pkg="tf" type="static_transform_publisher" name="baselink_laser_tf" args="0.0 0.0 0.0 0.13 0.0 0.39 base_link laser 100" />
+</group>
+
+</launch>

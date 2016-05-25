@@ -1,0 +1,9 @@
+<launch>
+
+	<node pkg="rosaria" type="RosAria" name="RosAria" output="screen">
+		<param name="port" value="/dev/ttyS0" />
+		<remap from="RosAria/cmd_vel" to="cmd_vel" />
+		<remap from="RosAria/pose" to="pose" />
+	</node>
+
+</launch>

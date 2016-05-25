@@ -1,0 +1,7 @@
+<launch>
+
+<include file="$(find pioneer_bringup)/launch/laser_lms1xx.launch" />
+
+<include file="$(find usb_cam)/launch/usb_cam-test.launch" />
+
+</launch>
