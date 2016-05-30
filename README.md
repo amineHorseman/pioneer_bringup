@@ -9,51 +9,40 @@ Note: This package have not yet been tested on ROS Kinetic Kame
 
 ### 1. Dependencies
 
-Enter in your catkin workspace directory
+- RosAria:
+
+RosAria is used to communicate with Pioneer robots hardware:
+
+*or refer to the official [How to install RosAria tutorial](http://wiki.ros.org/ROSARIA/Tutorials/How%20to%20use%20ROSARIA)*
 
 	$ cd ~/catkin_ws/src
-
-
-Get RosAria stack that allows to communicate with Pioneer robots hardware
-
-	$ git clone https://github.com/amor-ros-pkg/rosaria.git (master branch)
+	$ git clone https://github.com/amor-ros-pkg/rosaria.git
 	$ source ~/catkin_ws/devel/setup.bash
 	$ rosdep install rosaria
 
-Get and Install LMS1xx Package that allows to communicate with Sick LMS1xx Laser Range Finders
+- LMS1XX or LMS200 [optional]:
 
-- For ROS Kinetic Kame:
-	$ sudo apt-get install ros-kinetic-lms1xx
+Allow to communicate with Sick LMS1xx/LMS200 Laser Range Finders
 
-- For ROS Jade:
-	$ sudo apt-get install ros-jade-lms1xx
-	
-- For ROS Indigo:
-	$ sudo apt-get install ros-indigo-lms1xx
+	#replace <distro> by 'kinetic', 'jade', 'indigo' or 'hydro' according to your ROS version:
+	$ sudo apt-get install ros-<ditro>-lms1xx
 
-- For ROS Hydro:
-	$ sudo apt-get install ros-hydro-lms1xx
+- Usb_cam  [optional]:
 
+Allows to communicate with usb cameras and webcams
 
-Get and Install usb_cam Package that allows to communicate with usb cameras and webcams
+*this step can be skipped if you don't want to use usb camera, or if you want to invoke it yourself using another package*
 
-- For ROS Jade:
-	$ sudo apt-get install ros-jade-usb-cam
-	
-- For ROS Indigo:
-	$ sudo apt-get install ros-indigo-usb-cam
+	#replace <distro> by 'jade', 'indigo' or 'hydro' according to your ROS version:	
+	$ sudo apt-get install ros-<distro>-usb-cam
 
-- For ROS Hydro:
-	$ sudo apt-get install ros-hydro-usb-cam
+For kinetic users: read *known issues* section
 
+## 2. Get the source and build the workspace
 
-Get pioneer_bringup package that allows to launch base functionalities of Pioneer robots
-
+	$ cd ~/catkin_ws/src
 	$ git clone https://github.com/amineHorseman/pioneer_bringup.git
-
-## 2. Build the catkin workspace
-
-	$ cd ~/catkin_ws
+	$ cd ..
 	$ catkin_make
 
 
@@ -100,6 +89,17 @@ with this one:
 	$ <param name="port" value="/dev/ttyUSB0" />
 
 For more information about this modification, please refer to [RosAria documentation](http://wiki.ros.org/ROSARIA/Tutorials/How%20to%20use%20ROSARIA):
+
+### ros-kinetic-usb-cam package doesn't exist
+
+At the moment of writing this tutorial, usb_cam can be located by 'sudo apt-get install'
+
+Instead try to install it from source:
+
+	$ cd ~/catkin_ws/src
+	$ git clone https://github.com/bosch-ros-pkg/usb_cam.git
+	$ cd ..
+	$ catkin_make
 	
 ### Other issues
 
