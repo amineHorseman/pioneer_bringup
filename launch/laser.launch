@@ -1,0 +1,30 @@
+<launch>
+
+	<arg name="laser_type" default="false" doc="Laser type (choose from 'lms1xx', 'lms2xx') or false if no laser" />
+	<arg name="hostname" default="192.168.0.1" doc="Laser IP address or hostname (if applicable)" />
+	<arg name="port" default="/dev/ttyUSB0" doc="Laser Port (if applicable)" />
+	<arg name="baselink_laser_distance" default="0.13 0 0.39 0 0 0" doc="Distance between baselink and laser node in meters (for setting tf broadcast)" />
+
+	<group if="$(eval arg('laser_type')=='lms1xx' or arg('laser_type')=='lms2xx')">
+		<!-- using lms1xx package
+		<node pkg="lms1xx" type="LMS1xx_node" name="lms1xx" output="screen" if="$(eval arg('laser_type') == 'lms1xx')">
+			<param name="host" value="$(arg hostname)" />
+		</node>
+		-->
+		<include file="$(find sick_scan)/launch/sick_lms_1xx.launch" if="$(eval arg('laser_type')=='lms1xx')" />
+			<param name="hostname" value="$(arg hostname)" />
+
+		<node pkg="sicktoolbox_wrapper" type="sicklms" name="lms2xx" output="screen" if="$(eval arg('laser_type') == 'lms2xx')">
+			<param name="port" value="$(arg port)" />
+		</node>
+	</group>
+
+	<group>
+		<node pkg="pioneer_bringup" type="odom_baselink_tf.py" name="odom_baselink_tf" output="screen" />
+
+		<node pkg="tf" type="static_transform_publisher" name="basefootprint_baselink_tf" args="0.0 0.0 0.0 0.0 0.0 0.0 base_footprint base_link 100" />
+
+		<node pkg="tf" type="static_transform_publisher" name="baselink_laser_tf" args="$(arg baselink_laser_distance) base_link laser 100" />
+	</group>
+	
+</launch>
