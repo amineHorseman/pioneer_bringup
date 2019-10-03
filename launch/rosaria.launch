@@ -4,18 +4,16 @@
         computers with direct serial connection via COM1 serial port. Set to /dev/ttyUSBx 
         for use with a USB-serial adapter, where x is the appropriate interface index" />
     <arg name="laser" default="false" doc="" />
-    <arg name="usbcam" default="false" doc="true to launch usbcam node" />
+    <arg name="usb_cam" default="false" doc="true to launch usbcam node" />
     <arg name="kinect" default="false" doc="true to launch openi Kinect node" />
     <arg name="dashboard" default="false" doc="true to launch Pioneer_dashboard node" />
     <arg name="motors" default="true" doc="true to enable motors automatically while launching" />
-
-    <arg name="laser_hostname" default="192.168.0.1" doc="Laser IP address or hostname (if applicable)" />
-    <arg name="laser_port" default="/dev/ttyUSB0" doc="Laser Port (if applicable)" />
-    <arg name="baselink_laser_distance" default="0.13 0 0.39 0 0 0" doc="Distance between baselink and laser node in meters (for setting tf broadcast)" />
-
+    
+    <!-- RosAia -->
 	<node pkg="rosaria" type="RosAria" name="RosAria" output="screen">
 		<param name="port" value="$(arg port)" />
 		<remap from="RosAria/cmd_vel" to="cmd_vel" />
+		<remap from="RosAria/pose" to="odom" />
 		<remap from="RosAria/bumper_state" to="bumper_state" />
         <remap from="RosAria/sonar" to="sonar" />
         <remap from="RosAria/sonar_pointcloud2" to="sonar_pointcloud2" />
@@ -25,12 +23,27 @@
         <remap from="RosAria/motors_state" to="motors_state" />
 	</node>
 
+    <!-- laser -->
     <group unless="$(eval arg('laser') == false)">
-        <include file="$(find pioneer_bringup)/launch/laser.launch" />
+        <arg name="laser_hostname" default="192.168.0.1" doc="Laser IP address or hostname (if applicable)" />
+        <arg name="laser_port" default="/dev/ttyUSB0" doc="Laser Port (if applicable)" />
+        <arg name="baselink_laser_distance" default="0.13 0 0.39 0 0 0" doc="Distance between baselink and laser node in meters (for setting tf broadcast)" />
+        <include file="$(find pioneer_bringup)/launch/laser.launch">
 			<param name="hostname" value="$(arg laser_hostname)" />
 			<param name="port" value="$(arg laser_port)" />
 			<param name="laser_type" value="$(arg laser)" />
 			<param name="baselink_laser_distance" value="$(arg baselink_laser_distance)" />
+        </include>
+    </group>
+
+    <!-- usbcam -->
+    <group if="$(arg usb_cam)">
+        <include file="$(find pioneer_bringup)/launch/camera.launch">
+            <arg name="video_port" default="/dev/video0" doc="USB camera port on device (usually: /dev/video0)" />
+            <arg name="video_width" default="640" doc="Video image width" />
+            <arg name="video_height" default="480" doc="Video image height" />
+            <arg name="video_window" default="true" doc="Display video feed on the screen" />
+        </include>
     </group>
 
 </launch>
