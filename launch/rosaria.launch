@@ -3,12 +3,28 @@
     <arg name="port" default="/dev/ttyS0" doc="RosAria port. Set to /dev/ttyS0 for onboard 
         computers with direct serial connection via COM1 serial port. Set to /dev/ttyUSBx 
         for use with a USB-serial adapter, where x is the appropriate interface index" />
-    <arg name="laser" default="false" doc="" />
+    <arg name="laser" default="false" doc="" /> <!-- TODO: ADD DOC -->
     <arg name="usb_cam" default="false" doc="true to launch usbcam node" />
     <arg name="kinect" default="false" doc="true to launch openi Kinect node" />
     <arg name="dashboard" default="false" doc="true to launch Pioneer_dashboard node" />
     <arg name="motors" default="true" doc="true to enable motors automatically while launching" />
-    
+
+    <!-- laser specific configuration -->
+    <arg name="laser_hostname" default="192.168.0.1" doc="Laser IP address or hostname (if applicable)" />
+    <arg name="laser_port" default="/dev/ttyUSB0" doc="Laser Port (if applicable)" />
+    <arg name="baselink_laser_distance" default="0.13 0 0.39 0 0 0" doc="Distance between baselink and laser node in meters (for setting tf broadcast)" />
+        
+    <!-- usb camera specific configuration -->
+    <arg name="video_port" default="/dev/video0" doc="USB camera port on device (usually: /dev/video0)" />
+    <arg name="video_width" default="640" doc="Video image width" />
+    <arg name="video_height" default="480" doc="Video image height" />
+    <arg name="video_window" default="true" doc="Display video feed on the screen" />
+
+    <!-- kinect specific configuration -->
+    <arg name="kinect_data_skip" default="0" doc="number of frames to skip from kinect data" />
+    <arg name="kinect_id" default="#1" doc="kinect device number" />
+
+
     <!-- RosAia -->
 	<node pkg="rosaria" type="RosAria" name="RosAria" output="screen">
 		<param name="port" value="$(arg port)" />
@@ -25,36 +41,34 @@
 
     <!-- laser -->
     <group unless="$(eval arg('laser') == false)">
-        <arg name="laser_hostname" default="192.168.0.1" doc="Laser IP address or hostname (if applicable)" />
-        <arg name="laser_port" default="/dev/ttyUSB0" doc="Laser Port (if applicable)" />
-        <arg name="baselink_laser_distance" default="0.13 0 0.39 0 0 0" doc="Distance between baselink and laser node in meters (for setting tf broadcast)" />
         <include file="$(find pioneer_bringup)/launch/laser.launch">
-			<param name="hostname" value="$(arg laser_hostname)" />
-			<param name="port" value="$(arg laser_port)" />
-			<param name="laser_type" value="$(arg laser)" />
-			<param name="baselink_laser_distance" value="$(arg baselink_laser_distance)" />
+            <arg name="hostname" value="$(arg laser_hostname)" />
+            <arg name="port" value="$(arg laser_port)" />
+            <arg name="laser_type" value="$(arg laser)" />
+            <arg name="baselink_laser_distance" value="$(arg baselink_laser_distance)" />
         </include>
     </group>
 
     <!-- usbcam -->
     <group if="$(arg usb_cam)">
         <include file="$(find pioneer_bringup)/launch/camera.launch">
-            <arg name="video_port" default="/dev/video0" doc="USB camera port on device (usually: /dev/video0)" />
-            <arg name="video_width" default="640" doc="Video image width" />
-            <arg name="video_height" default="480" doc="Video image height" />
-            <arg name="video_window" default="true" doc="Display video feed on the screen" />
+            <arg name="video_port" value="$(arg video_port)" />
+            <arg name="video_width" value="$(arg video_width)" />
+            <arg name="video_height" value="$(arg video_height)" />
+            <arg name="video_window" value="$(arg video_window)" />
         </include>
     </group>
 
     <!-- kinect -->
     <group if="$(arg kinect)">
         <include file="$(find freenect_launch)/launch/freenect.launch">
+            <arg name="data_skip" value="$(arg kinect_data_skip)" />
+            <arg name="device_id" value="$(arg kinect_id)" />
         </include>
     </group>
 
     <!-- dashboard -->
     <group if="$(arg dashboard)">
-        <node name="pioneer_dashboard" pkg="rqt_gui" type="rqt_gui" respawn="false" output="screen" 
-              args="--perspective-file $(find pioneer_dashboard)/config/pioneer_dashboard.perspective" />
+        <node name="pioneer_dashboard" pkg="rqt_gui" type="rqt_gui" respawn="false" output="screen" args="--perspective-file $(find pioneer_dashboard)/config/pioneer_dashboard.perspective" />
     </group>
 </launch>

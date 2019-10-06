@@ -11,8 +11,9 @@
 			<param name="host" value="$(arg hostname)" />
 		</node>
 		-->
-		<include file="$(find sick_scan)/launch/sick_lms_1xx.launch" if="$(eval arg('laser_type')=='lms1xx')" />
-			<param name="hostname" value="$(arg hostname)" />
+		<include file="$(find sick_scan)/launch/sick_lms_1xx.launch" if="$(eval arg('laser_type')=='lms1xx')">
+			<arg name="hostname" value="$(arg hostname)" />
+		</include>
 
 		<node pkg="sicktoolbox_wrapper" type="sicklms" name="lms2xx" output="screen" if="$(eval arg('laser_type') == 'lms2xx')">
 			<param name="port" value="$(arg port)" />
