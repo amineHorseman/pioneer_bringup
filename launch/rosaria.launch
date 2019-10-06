@@ -46,4 +46,15 @@
         </include>
     </group>
 
+    <!-- kinect -->
+    <group if="$(arg kinect)">
+        <include file="$(find freenect_launch)/launch/freenect.launch">
+        </include>
+    </group>
+
+    <!-- dashboard -->
+    <group if="$(arg dashboard)">
+        <node name="pioneer_dashboard" pkg="rqt_gui" type="rqt_gui" respawn="false" output="screen" 
+              args="--perspective-file $(find pioneer_dashboard)/config/pioneer_dashboard.perspective" />
+    </group>
 </launch>
