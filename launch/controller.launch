@@ -1,0 +1,30 @@
+<launch>
+
+    <arg name="controller" default="rosaria" doc="hardware driver controller: 'rosaria' or 'p2os'" />
+    <arg name="port" default="/dev/ttyS0" doc="serial port to communicate with the controller. Should be '/dev/ttyS0' for COM1 port using the onboard computer, or '/dev/ttyUSB0' if using USB-Serial adapter with an external laptop" />
+    <arg name="sonar" default="false" doc="true to activate sonars" />
+    
+    <!-- RosAia -->
+	<node pkg="rosaria" type="RosAria" name="RosAria" output="screen"
+          if="$(eval arg('controller') == 'rosaria')">
+		<param name="port" value="$(arg port)" />
+		<remap from="RosAria/cmd_vel" to="cmd_vel" />
+		<remap from="RosAria/pose" to="odom" />
+		<remap from="RosAria/bumper_state" to="bumper_state" />
+        <remap from="RosAria/sonar" to="sonar" />
+        <remap from="RosAria/sonar_pointcloud2" to="sonar_pointcloud2" />
+        <remap from="RosAria/battery_state_of_charge" to="battery_state_of_charge" />
+        <remap from="RosAria/battery_voltage" to="battery_voltage" />
+        <remap from="RosAria/battery_recharge_state" to="battery_recharge_state" />
+        <remap from="RosAria/motors_state" to="motors_state" />
+	</node>
+
+    <!-- P2OS -->
+    <node pkg="p2os_driver" type="p2os_driver" name="p2os_driver" output="screen"
+          if="$(eval arg('controller') == 'p2os')">
+        <param name="port" value="$(arg port)" />
+        <param name="use_sonar" value="$(arg sonar)" />
+        <remap from="pose" to="odom" />
+    </node>
+
+</launch>

@@ -1,13 +1,12 @@
 <launch>
 
-    <arg name="port" default="/dev/ttyS0" doc="RosAria port. Set to /dev/ttyS0 for onboard 
-        computers with direct serial connection via COM1 serial port. Set to /dev/ttyUSBx 
-        for use with a USB-serial adapter, where x is the appropriate interface index" />
+    <arg name="controller" default="rosaria" doc="hardware driver controller: 'rosaria' or 'p2os'" />
+    <arg name="controller_port" default="/dev/ttyS0" doc="serial port to communicate with the controller. Should be '/dev/ttyS0' for COM1 port using the onboard computer, or '/dev/ttyUSB0' if using USB-Serial adapter with an external laptop" />
+    <arg name="sonar" default="false" doc="true to activate sonars" />
     <arg name="laser" default="false" doc="Laser reference code or 'false' if no laser (Possible laser references are: 'hokuyo', 'lms_1xx', 'lms_2xx', 'lms_1xxx', 'lms_4xxx', 'lms_5xx', 'mrs_1xxx', 'mrs_6xxx', 'rms_3xx', 'tim_5xx', 'tim_7xx', 'tim_7xxS')" />
     <arg name="usb_cam" default="false" doc="true to launch usbcam node" />
     <arg name="kinect" default="false" doc="true to launch openi Kinect node" />
     <arg name="dashboard" default="false" doc="true to launch Pioneer_dashboard node" />
-    <arg name="motors" default="true" doc="true to enable motors automatically while launching" />
 
     <!-- laser specific configuration -->
     <arg name="laser_hostname" default="192.168.0.1" doc="Laser IP address or hostname (if applicable)" />
@@ -24,20 +23,14 @@
     <arg name="kinect_data_skip" default="0" doc="number of frames to skip from kinect data" />
     <arg name="kinect_id" default="#1" doc="kinect device number" />
 
-
-    <!-- RosAia -->
-	<node pkg="rosaria" type="RosAria" name="RosAria" output="screen">
-		<param name="port" value="$(arg port)" />
-		<remap from="RosAria/cmd_vel" to="cmd_vel" />
-		<remap from="RosAria/pose" to="odom" />
-		<remap from="RosAria/bumper_state" to="bumper_state" />
-        <remap from="RosAria/sonar" to="sonar" />
-        <remap from="RosAria/sonar_pointcloud2" to="sonar_pointcloud2" />
-        <remap from="RosAria/battery_state_of_charge" to="battery_state_of_charge" />
-        <remap from="RosAria/battery_voltage" to="battery_voltage" />
-        <remap from="RosAria/battery_recharge_state" to="battery_recharge_state" />
-        <remap from="RosAria/motors_state" to="motors_state" />
-	</node>
+    <!-- hardware controller -->
+	<group>
+        <include file="$(find pioneer_bringup)/launch/controller.launch">
+            <arg name="controller" value="$(arg controller)" />
+            <arg name="port" value="$(arg controller_port)" />
+            <arg name="sonar" value="$(arg sonar)" />
+        </include>
+    </group>
 
     <!-- laser -->
     <group unless="$(eval arg('laser') == false)">
