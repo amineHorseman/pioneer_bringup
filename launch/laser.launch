@@ -1,31 +1,40 @@
 <launch>
 
-	<arg name="laser_type" default="false" doc="Laser type (choose from 'lms1xx', 'lms2xx') or false if no laser" />
-	<arg name="hostname" default="192.168.0.1" doc="Laser IP address or hostname (if applicable)" />
-	<arg name="port" default="/dev/ttyUSB0" doc="Laser Port (if applicable)" />
-	<arg name="baselink_laser_distance" default="0.13 0 0.39 0 0 0" doc="Distance between baselink and laser node in meters (for setting tf broadcast)" />
+	<arg name="laser_type" default="false" doc="Laser reference code or 'false' if no laser (Possible laser references are: 'hokuyo', 'lms_1xx', 'lms_2xx', 'lms_1xxx', 'lms_4xxx', 'lms_5xx', 'mrs_1xxx', 'mrs_6xxx', 'rms_3xx', 'tim_5xx', 'tim_7xx', 'tim_7xxS')" />
+	<arg name="laser_hostname" default="192.168.0.1" doc="Laser IP address or hostname (if applicable)" />
+	<arg name="laser_serial_port" default="/dev/ttyUSB0" doc="Laser Port (if applicable)" />
+	<arg name="laser_baselink_distance" default="0.13 0 0.39 0 0 0" doc="Distance between baselink and laser node in meters (for setting tf broadcast)" />
 
-	<group if="$(eval arg('laser_type')=='lms1xx' or arg('laser_type')=='lms2xx')">
-		<!-- using lms1xx package
-		<node pkg="lms1xx" type="LMS1xx_node" name="lms1xx" output="screen" if="$(eval arg('laser_type') == 'lms1xx')">
-			<param name="host" value="$(arg hostname)" />
-		</node>
-		-->
-		<include file="$(find sick_scan)/launch/sick_lms_1xx.launch" if="$(eval arg('laser_type')=='lms1xx')">
-			<arg name="hostname" value="$(arg hostname)" />
+	<!-- Launch the appropriate laser node -->
+	<group>
+		<include file="$(find lms1xx)/launch/LMS1xx.launch"  
+			  	 if="$(eval arg('laser_type') == 'lms_1xx')">
+			<arg name="host" value="$(arg laser_hostname)" />
 		</include>
 
-		<node pkg="sicktoolbox_wrapper" type="sicklms" name="lms2xx" output="screen" if="$(eval arg('laser_type') == 'lms2xx')">
-			<param name="port" value="$(arg port)" />
+		<node pkg="sicktoolbox_wrapper" type="sicklms" name="lms_2xx" output="screen"
+			  if="$(eval arg('laser_type') == 'lms_2xx')">
+			<param name="port" value="$(arg laser_serial_port)" />
 		</node>
+
+		<include file="$(find urg_node)/launch/urg_lidar.launch" 
+				 if="$(eval arg('laser_type')=='hokuyo')">
+			<arg name="ip_address" value="$(arg laser_hostname)" />
+			<arg name="serial_port" value="$(arg laser_serial_port)" />
+		</include>
+
+		<include file="$(find sick_scan)/launch/sick_$(arg laser_type).launch" 
+				 unless="$(eval arg('laser_type')=='lms_1xx' or arg('laser_type')=='lms_2xx'
+				 		or arg('laser_type')=='hokuyo')">
+			<arg name="hostname" value="$(arg laser_hostname)" />
+		</include>
 	</group>
 
+	<!-- Set the needed transforms -->
 	<group>
 		<node pkg="pioneer_bringup" type="odom_baselink_tf.py" name="odom_baselink_tf" output="screen" />
-
 		<node pkg="tf" type="static_transform_publisher" name="basefootprint_baselink_tf" args="0.0 0.0 0.0 0.0 0.0 0.0 base_footprint base_link 100" />
-
-		<node pkg="tf" type="static_transform_publisher" name="baselink_laser_tf" args="$(arg baselink_laser_distance) base_link laser 100" />
+		<node pkg="tf" type="static_transform_publisher" name="baselink_laser_tf" args="$(arg laser_baselink_distance) base_link laser 100" />
 	</group>
 	
 </launch>
