@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>pioneer_bringup</name>
-  <version>1.1.2</version>
+  <version>2.0.0</version>
 
   <description>pioneer_bringup provides roslaunch scripts for starting the core functionnalities of Adept MobileRobots Pioneer and Pioneer-compatible robots (Including Pioneer 2, Pioneer 3, Pioneer LX, AmigoBot, PeopleBot, PatrolBot, PowerBot, Seekur and Seekur Jr.)
   </description>
@@ -9,7 +9,7 @@
   <author email="bendahmane.amine@gmail.com">Amine BENDAHMANE</author>
   <maintainer email="bendahmane.amine@gmail.com">Amine BENDAHMANE</maintainer>
 
-  <license>ISC</license>
+  <license>GPLv3</license>
 
   <url type="website">http://wiki.ros.org/pioneer_bringup</url>
   <url type="repository">https://github.com/amineHorseman/pioneer_bringup</url> -->
@@ -19,8 +19,5 @@
   
   <run_depend>rospy</run_depend>
   <run_depend>geometry_msgs</run_depend>
-  <run_depend>rosaria</run_depend>
-  <run_depend>lms1xx</run_depend>
-  <run_depend>usb_cam</run_depend>
 
 </package>

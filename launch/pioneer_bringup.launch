@@ -5,13 +5,13 @@
     <arg name="sonar" default="false" doc="true to activate sonars (only for p2os controller)" />
     <arg name="laser" default="false" doc="Laser reference code or 'false' if no laser (Possible laser references are: 'hokuyo', 'lms_1xx', 'lms_2xx', 'lms_1xxx', 'lms_4xxx', 'lms_5xx', 'mrs_1xxx', 'mrs_6xxx', 'rms_3xx', 'tim_5xx', 'tim_7xx', 'tim_7xxS')" />
     <arg name="usbcam" default="false" doc="true to launch usbcam node" />
-    <arg name="kinect" default="false" doc="true to launch openi Kinect node" />
+    <arg name="kinect" default="false" doc="true to launch freenect Kinect node" />
     <arg name="dashboard" default="false" doc="true to launch Pioneer_dashboard node" />
 
     <!-- laser specific configuration -->
     <arg name="laser_hostname" default="192.168.0.1" doc="Laser IP address or hostname (if applicable)" />
     <arg name="laser_serial_port" default="/dev/ttyUSB0" doc="Laser Port (if applicable)" />
-    <arg name="laser_baselink_distance" default="0.13 0 0.39 0 0 0" doc="Distance between baselink and laser node in meters (for setting tf broadcast)" />
+    <arg name="laser_baselink_distance" default="0.13 0 0.39 0 0 0" doc="Distance between baselink and lidar in meters (for setting tf broadcast)" />
         
     <!-- usb camera specific configuration -->
     <arg name="camera_display" default="true" doc="Display video feed on the screen" />

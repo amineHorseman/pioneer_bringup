@@ -1,114 +1,99 @@
 Pionner_bringup
 ===============
 
-A ROS package providing roslaunch scripts for starting the Adept MobileRobots Pioneer and Pioneer-compatible robots (Including Pioneer 2, Pioneer 3, Pioneer LX, AmigoBot, PeopleBot, PatrolBot, PowerBot, Seekur and Seekur Jr.)
+A ROS package providing roslaunch functionalities for starting the Adept MobileRobots Pioneer and Pioneer-compatible robots (Including Pioneer 2, Pioneer 3, Pioneer LX, AmigoBot, PeopleBot, PatrolBot, PowerBot, Seekur and Seekur Jr.)
 
-Note: This package have not yet been tested on ROS Kinetic Kame
+Compatible with RosAria and P2OS hardware controllers.
 
 # Installation
 
-### 1. Dependencies
-
-- RosAria:
-
-RosAria is used to communicate with Pioneer robots hardware:
-
-*or refer to the official [How to install RosAria tutorial](http://wiki.ros.org/ROSARIA/Tutorials/How%20to%20use%20ROSARIA)*
-
-	$ cd ~/catkin_ws/src
-	$ git clone https://github.com/amor-ros-pkg/rosaria.git
-	$ source ~/catkin_ws/devel/setup.bash
-	$ rosdep install rosaria
-
-- LMS1XX or LMS200 [optional]:
-
-Allow to communicate with Sick LMS1xx/LMS200 Laser Range Finders
-
-	#replace <distro> by 'kinetic', 'jade', 'indigo' or 'hydro' according to your ROS version:
-	$ sudo apt-get install ros-<ditro>-lms1xx
-
-- Usb_cam  [optional]:
-
-Allows to communicate with usb cameras and webcams
-
-*this step can be skipped if you don't want to use usb camera, or if you want to invoke it yourself using another package*
-
-	#replace <distro> by 'jade', 'indigo' or 'hydro' according to your ROS version:	
-	$ sudo apt-get install ros-<distro>-usb-cam
-
-For kinetic users: read *known issues* section
-
-## 2. Get the source and build the workspace
-
-	$ cd ~/catkin_ws/src
-	$ git clone https://github.com/amineHorseman/pioneer_bringup.git
-	$ cd ..
-	$ catkin_make
-
+Depending on you needs, you may need to install some of these dependencies:
+- ROSARIA
+- P2OS
+- Urg_node: for using Hokuyo lidars
+- LMS1XX: for using Sick LMS100 lidar
+- Sicktoolbox_wrapper: for using Sick LMS2xx lidar
+- Sick_scan: for using other Sick lidars (see list bellow)
+- Usbcam: for using usb cameras and webcams
+- Freenect: for using Kinect
+- Pionner_dashboard: for GUI dashboard window
 
 # Usage
 
-There actually 3 bringup modes: 
+For starting the robot using the default parameters:
 
-### 1. Minimal mode
+	$ roslaunch pioneer_bringup pioneer_bringup.launch
 
-Starts up the robot with a single master ROS environment and ROSARIA:
+You can activate more features by using these arguments:
 
-		$ roslaunch pioneer_bringup minimal.launch
+| Argument        | Possible values                                                                                                                       | Default    | Description                                                                 |
+|-----------------|------------------------------------------------------------------------------------------------------------------------------|------------|-----------------------------------------------------------------------------|
+| controller      | rosaria, p2os                                                                                                                | rosaria    | Hardware driver controller                                                  |
+| controller_port | /dev/ttySx or /dev/ttyUSBx                                                                                                   | /dev/ttyS0 | Serial port to communicate with the controller                              |
+| sonar           | true, false                                                                                                                  | false      | Activate sonars                                                             |
+| laser           | hokuyo, lms_1xx, lms_2xx, lms_1xxx, lms_4xxx, lms_5xx, mrs_1xxx, mrs_6xxx, rms_3xx, tim_5xx, tim_7xx, tim_7xxS | false      | Laser reference code or 'false' if no laser                                 |
+| usbcam          | true, false                                                                                                                  | false      | launch usbcam node                                                          |
+| kinect          | true, false                                                                                                                  | false      | launch kinect nodes                                                         |
+| dashboard       | true, false                                                                                                                  | false      | launch a GUI window in rqt to visualize sensors readings and control motors |
 
-### 2. Camera mode
+**Example:**
 
-Can do everything minimal mode does, but also launches the usb cam node
+	$ roslaunch pioneer_bringup pioneer_bringup.launch controller:=p2os laser:=lms_5xx usbcam:=true 
 
-		$ roslaunch pioneer_bringup camera.launch
+### More controls for Laser node:
 
-### 3. Laser mode
+You can use the following arguments to lidar parameters:
 
-Can do everything minimal mode does, but also launches the Sick LMS1xx laser node:
+| Argument                | Possible values                     | Default           | Description                                                              |
+|-------------------------|----------------------------|-------------------|--------------------------------------------------------------------------|
+| laser_hostname          | IP Address                 | 192.168.0.1       | Laser IP address or hostname (if applicable)                             |
+| laser_serial_port       | /dev/ttySx or /dev/ttyUSBx | /dev/ttyUSB0      | Laser Port (if applicable)                                               |
+| laser_baselink_distance | x y z roll pitch yaw       | 0.13 0 0.39 0 0 0 | Distance between baselink and lidar in meters (for setting tf broadcast) |
 
-		$ roslaunch pioneer_bringup laser_lms1xx.launch
+**Example:**
 
-If you want to bringup both the laser and camera together use the following command:
+	$ roslaunch pioneer_bringup pioneer_bringup.launch laser:=lms_1xx laser_hostname:=192.168.0.4 laser_baselink_distance:='0.20 0 0.3 0 0 0'
 
-		$ roslaunch pionner_bringup laser_lms1xx.launch _camera:=1
+### More controls for Camera node:
+
+You can use the following arguments to customize the camera parameters:
+
+| Argument                | Values               | Default           | Description                                                              |
+|-------------------------|----------------------|-------------------|--------------------------------------------------------------------------|
+| camera_port             | /dev/videox (x = device number)         | /dev/video0       | USB Camera port                                                          |
+| camera_display          | true, false          | true              | Display video feed on the screen (or stop it)                            |
+
+**Other parameters:** You can customize more parameters in the config/camera.yaml file, such as: image_width, image_height, pixel_format, camera_frame_id and io_method.
+
+**Example:**
+
+	$ roslaunch pioneer_bringup pioneer_bringup.launch usbcam:=true camera_display:=false camera_port:=/dev/video2
+
+### More controls for Kinect node:
+
+You can use the following arguments to customize the kinect parameters:
+
+| Argument         | Values    | Default | Description                               |
+|------------------|-----------|---------|-------------------------------------------|
+| kinect_data_skip | <number>  | 0       | Number of frames to skip from kinect data |
+| kinect_id        | #<number> | #1      | kinect device number                      |
+
+
+**Example:**
+
+	$ roslaunch pioneer_bringup pioneer_bringup.launch kinect:=true kinect_data_skip:=5
+	
 
 # Known issues
 
-### Use USB port in RosAria instead of Serial
+### Cannot open /dev/ttyUSB0: Permission denied
 
-All the bringup modes call first RosAria package which is responsible to link ROS with the robot hardware.
+This is a frequent issue when using an USB-Serial adapter to connect to the robot hardware or lidar.
 
-Generally, the pioneer robots come with an onboard computer which communicate with the hardware throught Serial port, that's why, in the minimal.launch file we specify the port value as "/dev/ttyS0" (default value).
+Basically you just need to give the correct autorizations:
 
-Sometimes however, RosAria need to communicate throught USB port, and then, you need to replace the followin line in the minimal.launch file:
+	sudo chmod 777 -R /dev/ttyUSB0
 
-	$ <param name="port" value="/dev/ttyS0" />
-
-with this one:
-
-	$ <param name="port" value="/dev/ttyUSB0" />
-
-For more information about this modification, please refer to [RosAria documentation](http://wiki.ros.org/ROSARIA/Tutorials/How%20to%20use%20ROSARIA):
-
-### ros-kinetic-usb-cam package doesn't exist
-
-At the moment of writing this tutorial, usb_cam can be located by 'sudo apt-get install'
-
-Instead try to install it from source:
-
-	$ cd ~/catkin_ws/src
-	$ git clone https://github.com/bosch-ros-pkg/usb_cam.git
-	$ cd ..
-	$ catkin_make
-	
 ### Other issues
 
-Please report any problem in the [issues panel](https://github.com/amineHorseman/pioneer_bringup/issues)
-
-# TODO
-
-Feel free to contribute to this repository:
-- Test the package on ROS Kinetic Kame
-- Add argument to choose between Serial and USB port
-- Add Hokuyo Laser bringup mode
-- Add Rviz launcher?
+Please report any problem in the [issues section](https://github.com/amineHorseman/pioneer_bringup/issues)
