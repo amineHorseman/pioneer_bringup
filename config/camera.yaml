@@ -1,0 +1,5 @@
+image_width: 640
+image_height: 480
+pixel_format: "yuyv"
+camera_frame_id: "usb_cam"
+io_method: "mmap"

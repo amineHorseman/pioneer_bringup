@@ -1,22 +1,15 @@
 <launch>
+    <arg name="camera_display" default="true" doc="Display video feed on the screen" />
+    <arg name="camera_port" default="/dev/video0" doc="USB Camera port" />
 
-    <arg name="video_port" default="/dev/video0" doc="USB camera port on device (usually: /dev/video0)" />
-    <arg name="video_width" default="640" doc="Video image width" />
-    <arg name="video_height" default="480" doc="Video image height" />
-    <arg name="video_window" default="true" doc="Display video feed on the screen" />
-        
     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
-        <param name="video_device" value="$(arg video_port)" />
-        <param name="image_width" value="$(arg video_width)" />
-        <param name="image_height" value="$(arg video_height)" />
-        <param name="pixel_format" value="yuyv" />
-        <param name="camera_frame_id" value="usb_cam" />
-        <param name="io_method" value="mmap"/>
+        <rosparam command="load" file="$(find pioneer_bringup)/config/camera.yaml" />
+        <param name="video_device" value="$(arg camera_port)" />
     </node>
+
     <node name="image_view" pkg="image_view" type="image_view" respawn="false" output="screen"
-        if="$(arg video_window)">
+        if="$(arg camera_display)">
         <remap from="image" to="/usb_cam/image_raw"/>
         <param name="autosize" value="true" />
     </node>
-
 </launch>

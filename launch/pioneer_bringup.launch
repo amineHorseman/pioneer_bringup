@@ -2,9 +2,9 @@
 
     <arg name="controller" default="rosaria" doc="hardware driver controller: 'rosaria' or 'p2os'" />
     <arg name="controller_port" default="/dev/ttyS0" doc="serial port to communicate with the controller. Should be '/dev/ttyS0' for COM1 port using the onboard computer, or '/dev/ttyUSB0' if using USB-Serial adapter with an external laptop" />
-    <arg name="sonar" default="false" doc="true to activate sonars" />
+    <arg name="sonar" default="false" doc="true to activate sonars (only for p2os controller)" />
     <arg name="laser" default="false" doc="Laser reference code or 'false' if no laser (Possible laser references are: 'hokuyo', 'lms_1xx', 'lms_2xx', 'lms_1xxx', 'lms_4xxx', 'lms_5xx', 'mrs_1xxx', 'mrs_6xxx', 'rms_3xx', 'tim_5xx', 'tim_7xx', 'tim_7xxS')" />
-    <arg name="usb_cam" default="false" doc="true to launch usbcam node" />
+    <arg name="usbcam" default="false" doc="true to launch usbcam node" />
     <arg name="kinect" default="false" doc="true to launch openi Kinect node" />
     <arg name="dashboard" default="false" doc="true to launch Pioneer_dashboard node" />
 
@@ -14,10 +14,8 @@
     <arg name="laser_baselink_distance" default="0.13 0 0.39 0 0 0" doc="Distance between baselink and laser node in meters (for setting tf broadcast)" />
         
     <!-- usb camera specific configuration -->
-    <arg name="video_port" default="/dev/video0" doc="USB camera port on device (usually: /dev/video0)" />
-    <arg name="video_width" default="640" doc="Video image width" />
-    <arg name="video_height" default="480" doc="Video image height" />
-    <arg name="video_window" default="true" doc="Display video feed on the screen" />
+    <arg name="camera_display" default="true" doc="Display video feed on the screen" />
+    <arg name="camera_port" default="/dev/video0" doc="USB Camera port" />
 
     <!-- kinect specific configuration -->
     <arg name="kinect_data_skip" default="0" doc="number of frames to skip from kinect data" />
@@ -43,12 +41,10 @@
     </group>
 
     <!-- usbcam -->
-    <group if="$(arg usb_cam)">
+    <group if="$(arg usbcam)">
         <include file="$(find pioneer_bringup)/launch/camera.launch">
-            <arg name="video_port" value="$(arg video_port)" />
-            <arg name="video_width" value="$(arg video_width)" />
-            <arg name="video_height" value="$(arg video_height)" />
-            <arg name="video_window" value="$(arg video_window)" />
+            <arg name="camera_display" value="$(arg camera_display)" />
+            <arg name="camera_port" value="$(arg camera_port)" />
         </include>
     </group>
 
